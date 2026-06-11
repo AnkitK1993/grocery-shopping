@@ -169,17 +169,10 @@ body {
   height: 8px;
   border-radius: 50%;
   background-color: var(--success-color);
-  animation: pulse 2s infinite;
 }
 
 .sync-dot.offline {
   background-color: var(--danger-color);
-  animation: none;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
 }
 
 /* Main */

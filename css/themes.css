@@ -231,19 +231,3 @@ body.matrix-mode .slider::-webkit-slider-thumb:hover {
   box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
 }
 
-/* Matrix mode animations */
-@keyframes matrixGlitch {
-  0% {
-    text-shadow: 0 0 5px #00FF00;
-  }
-  50% {
-    text-shadow: 0 0 10px #00FF00, 0 0 20px #00FF00;
-  }
-  100% {
-    text-shadow: 0 0 5px #00FF00;
-  }
-}
-
-body.matrix-mode .app-title {
-  animation: matrixGlitch 3s infinite;
-}
