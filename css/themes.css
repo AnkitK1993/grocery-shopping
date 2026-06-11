@@ -1,0 +1,249 @@
+/* Accent Color Variables */
+
+/* Blue Theme (Default) */
+body.accent-blue {
+  --primary-color: #2196F3;
+  --primary-dark: #1976D2;
+  --primary-light: #42A5F5;
+}
+
+/* Green Theme */
+body.accent-green {
+  --primary-color: #4CAF50;
+  --primary-dark: #388E3C;
+  --primary-light: #66BB6A;
+}
+
+/* Purple Theme */
+body.accent-purple {
+  --primary-color: #9C27B0;
+  --primary-dark: #7B1FA2;
+  --primary-light: #BA68C8;
+}
+
+/* Red Theme */
+body.accent-red {
+  --primary-color: #F44336;
+  --primary-dark: #D32F2F;
+  --primary-light: #EF5350;
+}
+
+/* Orange Theme */
+body.accent-orange {
+  --primary-color: #FF9800;
+  --primary-dark: #F57C00;
+  --primary-light: #FFB74D;
+}
+
+/* Matrix Theme Specific */
+body.matrix-mode {
+  background-color: #000000;
+}
+
+body.matrix-mode .app-container {
+  background-color: #000000;
+}
+
+body.matrix-mode .app-header {
+  background-color: #0A0A0A;
+  border-bottom-color: #00FF00;
+}
+
+body.matrix-mode .app-title {
+  font-family: 'Courier New', monospace;
+  text-shadow: 0 0 10px #00FF00;
+  color: #00FF00;
+}
+
+body.matrix-mode .sync-text {
+  font-family: 'Courier New', monospace;
+}
+
+body.matrix-mode .user-bar {
+  background-color: #0A0A0A;
+  border-bottom-color: #00FF00;
+}
+
+body.matrix-mode .user-name {
+  font-family: 'Courier New', monospace;
+  color: #00FF00;
+  text-shadow: 0 0 5px #00FF00;
+}
+
+body.matrix-mode .tabs-container {
+  background-color: #0A0A0A;
+  border-bottom-color: #00FF00;
+}
+
+body.matrix-mode .tab-btn {
+  font-family: 'Courier New', monospace;
+  border-bottom-color: transparent;
+}
+
+body.matrix-mode .tab-btn.active {
+  border-bottom-color: #00FF00;
+  color: #00FF00;
+  text-shadow: 0 0 5px #00FF00;
+}
+
+body.matrix-mode .item-card {
+  background-color: #1A1A1A;
+  border-color: #00FF00;
+  font-family: 'Courier New', monospace;
+}
+
+body.matrix-mode .item-card:hover {
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+}
+
+body.matrix-mode .item-name {
+  color: #00FF00;
+  text-shadow: 0 0 3px #00FF00;
+}
+
+body.matrix-mode .item-details {
+  color: #00CC00;
+}
+
+body.matrix-mode .item-checkbox {
+  border-color: #00FF00;
+  background-color: transparent;
+}
+
+body.matrix-mode .item-card.completed .item-checkbox {
+  background-color: #00FF00;
+  border-color: #00FF00;
+}
+
+body.matrix-mode .item-card.completed .item-name {
+  opacity: 0.6;
+}
+
+body.matrix-mode .btn-primary {
+  background-color: #00FF00;
+  color: #000000;
+  font-weight: bold;
+  text-shadow: none;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+body.matrix-mode .btn-primary:active {
+  background-color: #00DD00;
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.7);
+}
+
+body.matrix-mode .form-input {
+  background-color: #1A1A1A;
+  border-color: #00FF00;
+  color: #00FF00;
+  font-family: 'Courier New', monospace;
+  caret-color: #00FF00;
+}
+
+body.matrix-mode .form-input:focus {
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+  border-color: #00FF00;
+}
+
+body.matrix-mode .form-input::placeholder {
+  color: #009900;
+}
+
+body.matrix-mode .modal-content {
+  background-color: #000000;
+  border: 1px solid #00FF00;
+  font-family: 'Courier New', monospace;
+}
+
+body.matrix-mode .modal-header {
+  border-bottom-color: #00FF00;
+}
+
+body.matrix-mode .modal-header h2 {
+  color: #00FF00;
+  text-shadow: 0 0 5px #00FF00;
+}
+
+body.matrix-mode .close-btn {
+  color: #00FF00;
+}
+
+body.matrix-mode .modal-overlay {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+body.matrix-mode .toast {
+  background-color: #1A1A1A;
+  border-color: #00FF00;
+  color: #00FF00;
+  font-family: 'Courier New', monospace;
+  text-shadow: 0 0 3px #00FF00;
+}
+
+body.matrix-mode .spinner {
+  border-color: #009900;
+  border-top-color: #00FF00;
+}
+
+body.matrix-mode .progress-fill {
+  background-color: #00FF00;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+body.matrix-mode .completion-banner {
+  background-color: #000000;
+  border: 2px solid #00FF00;
+  color: #00FF00;
+  font-family: 'Courier New', monospace;
+  text-shadow: 0 0 5px #00FF00;
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+}
+
+body.matrix-mode .theme-btn.active,
+body.matrix-mode .color-btn.active {
+  background-color: #00FF00;
+  color: #000000;
+  border-color: #00FF00;
+}
+
+body.matrix-mode .filter-btn.active {
+  background-color: #00FF00;
+  color: #000000;
+  border-color: #00FF00;
+  box-shadow: 0 0 8px rgba(0, 255, 0, 0.4);
+}
+
+body.matrix-mode .slider {
+  background-color: #009900;
+}
+
+body.matrix-mode .slider::-webkit-slider-thumb {
+  background: #00FF00;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.6);
+}
+
+body.matrix-mode .slider::-moz-range-thumb {
+  background: #00FF00;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.6);
+}
+
+body.matrix-mode .slider::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
+}
+
+/* Matrix mode animations */
+@keyframes matrixGlitch {
+  0% {
+    text-shadow: 0 0 5px #00FF00;
+  }
+  50% {
+    text-shadow: 0 0 10px #00FF00, 0 0 20px #00FF00;
+  }
+  100% {
+    text-shadow: 0 0 5px #00FF00;
+  }
+}
+
+body.matrix-mode .app-title {
+  animation: matrixGlitch 3s infinite;
+}

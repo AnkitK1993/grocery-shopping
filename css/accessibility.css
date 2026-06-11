@@ -1,0 +1,103 @@
+/* Accessibility: global font scaling and zoom.
+   JS sets --font-scale and --zoom-scale on <html>. */
+
+:root {
+  --font-scale: 1;
+  --zoom-scale: 1;
+}
+
+html {
+  font-size: calc(16px * var(--font-scale));
+}
+
+/* Zoom is applied to the app container so fixed elements stay aligned */
+.app-container {
+  transform: scale(var(--zoom-scale));
+  transform-origin: top center;
+  width: calc(100% / var(--zoom-scale));
+  height: calc(100vh / var(--zoom-scale));
+  margin: 0 auto;
+}
+
+/* Larger tap targets when fonts grow */
+button,
+.item-card,
+input,
+textarea {
+  min-height: 44px; /* iOS/Android recommended touch target */
+}
+
+.item-delete-btn {
+  min-height: 0;
+}
+
+input[type="range"] {
+  min-height: 28px;
+}
+
+input[type="checkbox"] {
+  min-height: 0;
+}
+
+/* Visible focus for keyboard / switch-control users */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+.item-card:focus-visible {
+  outline: 3px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Respect reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Screen-reader-only helper */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Section group headers inside the items grid */
+.group-header {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 8px 4px 0;
+  border-bottom: 1px solid var(--border-color);
+  margin-top: 4px;
+}
+
+.group-header .group-title {
+  font-weight: 700;
+  font-size: var(--font-size-base);
+}
+
+.group-header .group-count {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+.group-header.group-done .group-title {
+  color: var(--success-color);
+}
+
+body.matrix-mode .group-header {
+  border-bottom-color: #00FF00;
+  font-family: 'Courier New', monospace;
+}
