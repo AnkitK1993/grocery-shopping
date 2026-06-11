@@ -14,9 +14,30 @@ const Auth = {
     this._listeners.forEach((cb) => cb(this.user));
   },
 
+  /** True when the email is on the allowlist (or the allowlist is empty). */
+  isAllowed(email) {
+    if (!ALLOWED_EMAILS.length) return true;
+    return ALLOWED_EMAILS.some(
+      (allowed) => allowed.toLowerCase() === String(email || "").toLowerCase()
+    );
+  },
+
   init() {
     if (FIREBASE_ENABLED) {
+      if (GOOGLE_SIGNIN_ONLY) {
+        document.querySelector(".auth-form").style.display = "none";
+        document.querySelector(".auth-divider").style.display = "none";
+        document.querySelector(".auth-footer").textContent =
+          "Sign in with the family Google account to continue.";
+      }
       firebase.auth().onAuthStateChanged((fbUser) => {
+        if (fbUser && !this.isAllowed(fbUser.email)) {
+          showToast(`${fbUser.email} is not authorized to use this app`, "error", 4000);
+          firebase.auth().signOut();
+          this.user = null;
+          this._emit();
+          return;
+        }
         this.user = fbUser
           ? { uid: fbUser.uid, name: fbUser.displayName || fbUser.email, email: fbUser.email }
           : null;

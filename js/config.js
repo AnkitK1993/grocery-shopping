@@ -24,5 +24,17 @@ const FIREBASE_CONFIG = {
 /** Both family members share this list. Change to keep separate lists. */
 const SHARED_LIST_ID = "family-list";
 
+/**
+ * Access control: only these emails may use the app (case-insensitive).
+ * Add your dad's email here later. Leave the array empty to allow anyone.
+ * NOTE: also mirror this list in the Realtime Database rules (see README)
+ * so it is enforced server-side, not just in the UI.
+ */
+const ALLOWED_EMAILS = ["ankit.konchady@gmail.com"];
+
+/** When true (and Firebase is enabled), hide the email/password form so
+ *  Google sign-in is the only way in. */
+const GOOGLE_SIGNIN_ONLY = true;
+
 /** True when a real Firebase config has been provided. */
 const FIREBASE_ENABLED = Boolean(FIREBASE_CONFIG.apiKey);

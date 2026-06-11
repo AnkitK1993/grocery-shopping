@@ -31,19 +31,26 @@ Open the URL on your phone (same Wi-Fi) or in two browser tabs to see the cross-
 
 1. Create a project at [console.firebase.google.com](https://console.firebase.google.com).
 2. **Authentication → Sign-in method**: enable *Email/Password* and *Google*.
-3. **Realtime Database**: create a database, start in locked mode, then set rules:
+3. **Realtime Database**: create a database, start in locked mode, then set rules.
+   These rules restrict access to the allowed account(s) — keep them in sync
+   with `ALLOWED_EMAILS` in `js/config.js`:
    ```json
    {
      "rules": {
        "lists": {
          "$listId": {
-           ".read": "auth != null",
-           ".write": "auth != null"
+           ".read": "auth != null && auth.token.email === 'ankit.konchady@gmail.com'",
+           ".write": "auth != null && auth.token.email === 'ankit.konchady@gmail.com'"
          }
        }
      }
    }
    ```
+   To allow a second person (e.g. your dad), change both rules to:
+   ```
+   "auth != null && (auth.token.email === 'ankit.konchady@gmail.com' || auth.token.email === 'dad@example.com')"
+   ```
+   and add the email to `ALLOWED_EMAILS` in `js/config.js`.
 4. **Project settings → Your apps → Web app**: register an app and copy the config object.
 5. Paste the config into `js/config.js` (`FIREBASE_CONFIG`). The presence of an `apiKey` automatically switches the app from demo mode to Firebase mode.
 6. Deploy anywhere static (Firebase Hosting, GitHub Pages, Netlify) and have both phones sign in — you'll share the `family-list` defined by `SHARED_LIST_ID` in `js/config.js`.
