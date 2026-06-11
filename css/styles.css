@@ -260,16 +260,30 @@ textarea {
   min-height: 80px;
 }
 
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 8px;
-  margin-bottom: 16px;
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 12px;
 }
 
-.form-input.small {
-  padding: 8px;
-  font-size: var(--font-size-sm);
+.field-label {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 72px 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 0;
+}
+
+.form-row .form-field {
+  margin-bottom: 12px;
 }
 
 .auth-divider {
@@ -395,7 +409,7 @@ textarea {
 }
 
 .add-item-form {
-  padding: 16px;
+  padding: 12px 16px 4px;
   background-color: var(--bg-secondary);
   border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
