@@ -1,7 +1,7 @@
 /**
  * DataStore — single real-time data layer for the whole app.
  *
- * Firebase mode : Realtime Database under lists/{SHARED_LIST_ID}/...
+ * Firebase mode : Firestore under lists/{SHARED_LIST_ID}/items|expenses|history
  *                 Every connected device gets instant updates.
  * Demo mode     : localStorage + BroadcastChannel, so two browser tabs
  *                 on the same machine still sync in real time.
@@ -16,6 +16,7 @@ const DataStore = {
   _itemsCb: () => {},
   _expensesCb: () => {},
   _historyCb: () => {},
+  _unsubs: [],
   _channel: null,
 
   onItems(cb) { this._itemsCb = cb; },
@@ -26,13 +27,19 @@ const DataStore = {
 
   start() {
     if (FIREBASE_ENABLED) {
-      this._ref("items").on("value", (snap) => this._itemsCb(this._toList(snap.val())));
-      this._ref("expenses").on("value", (snap) => this._expensesCb(this._toList(snap.val())));
-      this._ref("history").on("value", (snap) => this._historyCb(this._toList(snap.val())));
-
-      firebase.database().ref(".info/connected").on("value", (snap) => {
-        setSyncStatus(snap.val() === true);
-      });
+      const listen = (name, cb, trackSync) => {
+        const unsub = this._col(name).onSnapshot(
+          (snap) => {
+            if (trackSync) setSyncStatus(!snap.metadata.fromCache);
+            cb(this._fromSnap(snap));
+          },
+          (err) => console.error(name, err)
+        );
+        this._unsubs.push(unsub);
+      };
+      listen("items",    (list) => this._itemsCb(list),    true);
+      listen("expenses", (list) => this._expensesCb(list), false);
+      listen("history",  (list) => this._historyCb(list),  false);
     } else {
       this._channel = new BroadcastChannel("gs-sync");
       this._channel.onmessage = () => this._emitLocal();
@@ -43,9 +50,8 @@ const DataStore = {
 
   stop() {
     if (FIREBASE_ENABLED) {
-      this._ref("items").off();
-      this._ref("expenses").off();
-      this._ref("history").off();
+      this._unsubs.forEach((unsub) => unsub());
+      this._unsubs = [];
     } else if (this._channel) {
       this._channel.close();
       this._channel = null;
@@ -57,12 +63,18 @@ const DataStore = {
   addItem(item) {
     item.id = uid();
     item.createdAt = Date.now();
-    this._set(`items/${item.id}`, item);
+    if (FIREBASE_ENABLED) {
+      this._col("items").doc(item.id).set(item);
+    } else {
+      const data = this._localRead();
+      data.items[item.id] = item;
+      this._localWrite(data);
+    }
   },
 
   updateItem(id, patch) {
     if (FIREBASE_ENABLED) {
-      this._ref(`items/${id}`).update(patch);
+      this._col("items").doc(id).update(patch);
     } else {
       const data = this._localRead();
       if (data.items[id]) Object.assign(data.items[id], patch);
@@ -71,11 +83,23 @@ const DataStore = {
   },
 
   deleteItem(id) {
-    this._set(`items/${id}`, null);
+    if (FIREBASE_ENABLED) {
+      this._col("items").doc(id).delete();
+    } else {
+      const data = this._localRead();
+      delete data.items[id];
+      this._localWrite(data);
+    }
   },
 
   clearItems() {
-    this._set("items", null);
+    if (FIREBASE_ENABLED) {
+      this._batchDelete("items");
+    } else {
+      const data = this._localRead();
+      data.items = {};
+      this._localWrite(data);
+    }
   },
 
   /* ---------- expenses & history ---------- */
@@ -83,18 +107,32 @@ const DataStore = {
   addExpense(expense) {
     expense.id = uid();
     expense.at = Date.now();
-    this._set(`expenses/${expense.id}`, expense);
+    if (FIREBASE_ENABLED) {
+      this._col("expenses").doc(expense.id).set(expense);
+    } else {
+      const data = this._localRead();
+      data.expenses[expense.id] = expense;
+      this._localWrite(data);
+    }
   },
 
   addHistory(entry) {
     entry.id = uid();
     entry.at = Date.now();
-    this._set(`history/${entry.id}`, entry);
+    if (FIREBASE_ENABLED) {
+      this._col("history").doc(entry.id).set(entry);
+    } else {
+      const data = this._localRead();
+      data.history[entry.id] = entry;
+      this._localWrite(data);
+    }
   },
 
   clearAll() {
     if (FIREBASE_ENABLED) {
-      this._ref("").set(null);
+      this._batchDelete("items");
+      this._batchDelete("expenses");
+      this._batchDelete("history");
     } else {
       this._localWrite({ items: {}, expenses: {}, history: {} });
     }
@@ -102,29 +140,29 @@ const DataStore = {
 
   /* ---------- internals ---------- */
 
-  _ref(path) {
-    return firebase.database().ref(`lists/${SHARED_LIST_ID}/${path}`);
+  _col(name) {
+    return firebase.firestore()
+      .collection("lists").doc(SHARED_LIST_ID).collection(name);
   },
 
-  _set(path, value) {
-    if (FIREBASE_ENABLED) {
-      this._ref(path).set(value);
-    } else {
-      const data = this._localRead();
-      const [bucket, id] = path.split("/");
-      if (id === undefined) {
-        data[bucket] = value === null ? {} : value;
-      } else if (value === null) {
-        delete data[bucket][id];
-      } else {
-        data[bucket][id] = value;
-      }
-      this._localWrite(data);
-    }
+  _batchDelete(name) {
+    this._col(name).get().then((snap) => {
+      const batch = firebase.firestore().batch();
+      snap.docs.forEach((d) => batch.delete(d.ref));
+      return batch.commit();
+    });
+  },
+
+  _fromSnap(snap) {
+    return snap.docs
+      .map((d) => ({ id: d.id, ...d.data() }))
+      .sort((a, b) => (a.createdAt || a.at || 0) - (b.createdAt || b.at || 0));
   },
 
   _toList(obj) {
-    return obj ? Object.values(obj).sort((a, b) => (a.createdAt || a.at || 0) - (b.createdAt || b.at || 0)) : [];
+    return obj
+      ? Object.values(obj).sort((a, b) => (a.createdAt || a.at || 0) - (b.createdAt || b.at || 0))
+      : [];
   },
 
   _localRead() {

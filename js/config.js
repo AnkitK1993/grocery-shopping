@@ -30,7 +30,10 @@ const SHARED_LIST_ID = "family-list";
  * NOTE: also mirror this list in the Realtime Database rules (see README)
  * so it is enforced server-side, not just in the UI.
  */
-const ALLOWED_EMAILS = ["ankit.konchady@gmail.com"];
+/** The one account that can always sign in and manage access for others. */
+const ADMIN_EMAIL = "ankit.konchady@gmail.com";
+
+const ALLOWED_EMAILS = [ADMIN_EMAIL];
 
 /** When true (and Firebase is enabled), hide the email/password form so
  *  Google sign-in is the only way in. */

@@ -12,20 +12,32 @@ document.addEventListener("DOMContentLoaded", () => {
   Expenses.init();
   initTabs();
   initSettings();
+  initAccessManagement();
 
   Auth.onChange((user) => {
     $("loadingScreen").style.display = "none";
     $("appContainer").style.display = "flex";
 
     if (user) {
+      Themes.applyTheme("dark");
       $("authSection").style.display = "none";
       $("mainSection").style.display = "flex";
       $("userName").textContent = user.name || user.email;
+
+      const isAdmin = Auth.isAdmin(user.email);
+      $("accessManagementGroup").style.display = isAdmin ? "block" : "none";
+      $("masterTabBtn").style.display          = isAdmin ? ""      : "none";
+      if (isAdmin) renderAccessList();
+
       DataStore.start();
+      Masters.start();
     } else {
       $("authSection").style.display = "flex";
       $("mainSection").style.display = "none";
+      $("accessManagementGroup").style.display = "none";
+      $("masterTabBtn").style.display          = "none";
       DataStore.stop();
+      Masters.stop();
     }
   });
 
@@ -49,7 +61,69 @@ function initTabs() {
       const target = $(`${btn.dataset.tab}Tab`);
       target.style.display = "flex";
       target.classList.add("active");
+      if (btn.dataset.tab === "master") Masters.render();
       haptic(15);
+    });
+  });
+}
+
+/* ---------- Access Management ---------- */
+
+function initAccessManagement() {
+  $("addAllowedEmailBtn").addEventListener("click", async () => {
+    const input = $("newAllowedEmail");
+    const email = input.value.trim().toLowerCase();
+    if (!email || !email.includes("@")) {
+      showToast("Enter a valid email address", "error");
+      return;
+    }
+    const list = Auth.getAccessList();
+    if (list.map((e) => e.toLowerCase()).includes(email)) {
+      showToast("Email already has access", "info");
+      return;
+    }
+    try {
+      await Auth.saveAccessList([...list, email]);
+      input.value = "";
+      showToast(`Access granted to ${email}`, "success");
+      renderAccessList();
+    } catch (err) {
+      showToast("Failed to update access list", "error");
+    }
+  });
+
+  $("newAllowedEmail").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") $("addAllowedEmailBtn").click();
+  });
+}
+
+function renderAccessList() {
+  const ul = $("allowedEmailsList");
+  ul.innerHTML = "";
+  Auth.getAccessList().forEach((email) => {
+    const isAdmin = Auth.isAdmin(email);
+    const li = document.createElement("li");
+    li.className = "allowed-email-row";
+    li.innerHTML = `
+      <span class="email-label">${email}</span>
+      ${isAdmin ? '<span class="admin-badge">admin</span>' : ""}
+      ${isAdmin ? "" : `<button class="remove-email-btn" data-email="${email}" aria-label="Remove ${email}">&times;</button>`}
+    `;
+    ul.appendChild(li);
+  });
+
+  ul.querySelectorAll(".remove-email-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const email = btn.dataset.email;
+      if (!confirm(`Remove access for ${email}?`)) return;
+      const list = Auth.getAccessList().filter((e) => e.toLowerCase() !== email.toLowerCase());
+      try {
+        await Auth.saveAccessList(list);
+        showToast(`Access removed for ${email}`, "warning");
+        renderAccessList();
+      } catch (err) {
+        showToast("Failed to update access list", "error");
+      }
     });
   });
 }
@@ -66,7 +140,9 @@ function initSettings() {
   };
   const close = () => {
     modal.style.display = "none";
-    overlay.style.display = "none";
+    if ($("editModal").style.display === "none") {
+      overlay.style.display = "none";
+    }
   };
 
   $("settingsBtn").addEventListener("click", open);

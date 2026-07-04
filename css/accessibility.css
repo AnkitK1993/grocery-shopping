@@ -72,9 +72,8 @@ textarea:focus-visible,
   border: 0;
 }
 
-/* Section group headers inside the items grid */
+/* Section group headers */
 .group-header {
-  grid-column: 1 / -1;
   display: flex;
   justify-content: space-between;
   align-items: baseline;
